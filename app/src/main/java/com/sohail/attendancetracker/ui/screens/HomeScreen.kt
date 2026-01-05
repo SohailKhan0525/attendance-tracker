@@ -149,7 +149,7 @@ private fun OverallStatsCard(stats: OverallStats) {
             
             // Progress bar
             LinearProgressIndicator(
-                progress = { (stats.percentage / 100f).coerceIn(0f, 1f) },
+                progress = (stats.percentage / 100f).coerceIn(0f, 1f),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp)
@@ -225,7 +225,7 @@ private fun SubjectStatsCard(
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 LinearProgressIndicator(
-                    progress = { (subject.percentage / 100f).coerceIn(0f, 1f) },
+                    progress = (subject.percentage / 100f).coerceIn(0f, 1f),
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
                         .height(6.dp)
