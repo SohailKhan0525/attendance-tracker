@@ -150,7 +150,7 @@ private fun SubjectStatsDetailCard(stats: com.sohail.attendancetracker.data.mode
             Spacer(modifier = Modifier.height(8.dp))
             
             LinearProgressIndicator(
-                progress = { (stats.percentage / 100f).coerceIn(0f, 1f) },
+                progress = (stats.percentage / 100f).coerceIn(0f, 1f),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp)
