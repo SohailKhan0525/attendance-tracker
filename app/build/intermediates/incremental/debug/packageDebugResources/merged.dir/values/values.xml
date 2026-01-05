@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Attendance Tracker</string>
+    <string formatted="false" name="low_attendance_body">formattedatted attendance is below 72%. Please improve it.</string>
+    <string name="low_attendance_title">Low Attendance Warning</string>
+    <string name="notification_channel_description">Notifications for low attendance warnings</string>
+    <string name="notification_channel_name">Attendance Alerts</string>
+    <style name="Theme.AttendanceTracker" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>
