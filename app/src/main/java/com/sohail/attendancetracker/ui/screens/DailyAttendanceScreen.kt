@@ -245,6 +245,7 @@ private fun DateSelectorCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PeriodCard(
     period: Int,

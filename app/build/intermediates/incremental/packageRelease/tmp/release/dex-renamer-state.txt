@@ -1,0 +1,4 @@
+#Tue Jan 06 11:07:56 UTC 2026
+base.0=/workspaces/attendance-tracker/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

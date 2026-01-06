@@ -4,5 +4,5 @@
     <string name="notification_channel_name">Attendance Alerts</string>
     <string name="notification_channel_description">Notifications for low attendance warnings</string>
     <string name="low_attendance_title">Low Attendance Warning</string>
-    <string name="low_attendance_body" formatted="false">formattedatted attendance is below 72%. Please improve it.</string>
+    <string name="low_attendance_body">Your attendance is currently %1$.1f%%. Please improve it.</string>
 </resources>
