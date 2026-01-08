@@ -24,7 +24,7 @@ android {
         buildConfigField(
             "String",
             "UPDATE_INFO_URL",
-            "\"https://raw.githubusercontent.com/SohailKhan0525/attendance-tracker/main/update.json\""
+            "\"https://raw.githubusercontent.com/SohailKhan0525/attendance-tracker/refs/head/main/update.json\""
         )
     }
 
