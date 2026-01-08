@@ -13,6 +13,7 @@ import java.time.LocalDate
  * Repository for managing attendance data
  */
 class AttendanceRepository(private val dao: AttendanceDao) {
+    private val excludedSubjectsFromStats = Subjects.excludedFromStats
     
     // Flow operations
     fun getAllRecords(): Flow<List<AttendanceRecord>> = dao.getAllRecords()
@@ -58,8 +59,12 @@ class AttendanceRepository(private val dao: AttendanceDao) {
     
     // Statistics
     suspend fun getOverallStats(): OverallStats {
-        val total = dao.getTotalRecords()
-        val present = dao.getTotalPresent()
+        val (total, present) = if (excludedSubjectsFromStats.isEmpty()) {
+            dao.getTotalRecords() to dao.getTotalPresent()
+        } else {
+            dao.getTotalRecordsExcluding(excludedSubjectsFromStats) to
+                dao.getTotalPresentExcluding(excludedSubjectsFromStats)
+        }
         val percentage = if (total > 0) (present.toFloat() / total * 100) else 0f
         
         // Calculate safe bunks: How many more classes can be bunked while staying at 70%
@@ -92,7 +97,7 @@ class AttendanceRepository(private val dao: AttendanceDao) {
     }
     
     suspend fun getAllSubjectStats(): List<SubjectStats> {
-        return Subjects.allSubjects.map { subject ->
+        return Subjects.trackableSubjects.map { subject ->
             getSubjectStats(subject.name)
         }
     }

@@ -48,6 +48,12 @@ interface AttendanceDao {
     
     @Query("SELECT COUNT(*) FROM attendance_records")
     suspend fun getTotalRecords(): Int
+
+    @Query("SELECT COUNT(*) FROM attendance_records WHERE isPresent = 1 AND subjectName NOT IN (:excludedSubjects)")
+    suspend fun getTotalPresentExcluding(excludedSubjects: List<String>): Int
+
+    @Query("SELECT COUNT(*) FROM attendance_records WHERE subjectName NOT IN (:excludedSubjects)")
+    suspend fun getTotalRecordsExcluding(excludedSubjects: List<String>): Int
     
     @Query("SELECT COUNT(*) FROM attendance_records WHERE subjectName = :subjectName AND isPresent = 1")
     suspend fun getSubjectPresent(subjectName: String): Int

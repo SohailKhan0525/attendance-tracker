@@ -34,5 +34,13 @@ object Subjects {
         Subject("Library", "Library", SubjectType.OTHER)
     )
     
+    /** Subjects that contribute towards attendance calculations */
+    val trackableSubjects = allSubjects.filter { it.type != SubjectType.OTHER }
+
+    /** Subjects that should be kept as options but excluded from stats */
+    val excludedFromStats = allSubjects
+        .filter { it.type == SubjectType.OTHER }
+        .map { it.name }
+
     val subjectNames = allSubjects.map { it.name }
 }

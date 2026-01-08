@@ -20,6 +20,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField(
+            "String",
+            "UPDATE_INFO_URL",
+            "\"https://raw.githubusercontent.com/SohailKhan0525/attendance-tracker/main/update.json\""
+        )
     }
 
     buildTypes {
@@ -44,6 +50,7 @@ android {
     
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     
     packaging {

@@ -1,6 +1,10 @@
 package com.sohail.attendancetracker
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -9,6 +13,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -20,9 +25,10 @@ import com.sohail.attendancetracker.navigation.AttendanceNavHost
 import com.sohail.attendancetracker.navigation.Screen
 import com.sohail.attendancetracker.notification.AttendanceNotificationHelper
 import com.sohail.attendancetracker.ui.theme.AttendanceTrackerTheme
+import com.sohail.attendancetracker.update.UpdateChecker
+import com.sohail.attendancetracker.update.UpdateInfo
+import com.sohail.attendancetracker.update.UpdateResult
 import com.sohail.attendancetracker.viewmodel.*
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 /**
  * Main activity
@@ -67,6 +73,7 @@ fun AttendanceApp(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val context = LocalContext.current
     
     // ViewModels
     val homeViewModel: HomeViewModel = viewModel(
@@ -84,6 +91,24 @@ fun AttendanceApp(
     val settingsViewModel: SettingsViewModel = viewModel(
         factory = SettingsViewModelFactory(preferencesManager)
     )
+
+    var updateInfo by remember { mutableStateOf<UpdateInfo?>(null) }
+    var updateError by remember { mutableStateOf<Throwable?>(null) }
+
+    LaunchedEffect(Unit) {
+        when (val result = UpdateChecker.checkForUpdates()) {
+            is UpdateResult.UpdateAvailable -> updateInfo = result.info
+            is UpdateResult.Error -> updateError = result.throwable
+            else -> { /* no-op */ }
+        }
+    }
+
+    LaunchedEffect(updateError) {
+        updateError?.let {
+            Toast.makeText(context, "Unable to check updates", Toast.LENGTH_SHORT).show()
+            updateError = null
+        }
+    }
     
     // Show bottom bar only on home screen
     val showBottomBar = currentRoute == Screen.Home.route
@@ -136,5 +161,61 @@ fun AttendanceApp(
                 settingsViewModel = settingsViewModel
             )
         }
+    }
+
+    updateInfo?.let { info ->
+        UpdatePrompt(
+            info = info,
+            onUpdateNow = {
+                openUpdateUrl(context, info.downloadUrl)
+                if (!info.isForceUpdate) {
+                    updateInfo = null
+                }
+            },
+            onRemindLater = { updateInfo = null }
+        )
+    }
+}
+
+@Composable
+private fun UpdatePrompt(
+    info: UpdateInfo,
+    onUpdateNow: () -> Unit,
+    onRemindLater: () -> Unit
+) {
+    val title = if (info.isForceUpdate) "Update Required" else "Update Available"
+    val description = info.message ?: "Version ${info.versionName ?: info.versionCode} is available. Download the latest build to continue."
+
+    AlertDialog(
+        onDismissRequest = {
+            if (!info.isForceUpdate) {
+                onRemindLater()
+            }
+        },
+        title = { Text(title) },
+        text = { Text(description) },
+        confirmButton = {
+            TextButton(onClick = onUpdateNow) {
+                Text("Update")
+            }
+        },
+        dismissButton = if (!info.isForceUpdate) {
+            {
+                TextButton(onClick = onRemindLater) {
+                    Text("Later")
+                }
+            }
+        } else null
+    )
+}
+
+private fun openUpdateUrl(context: Context, url: String) {
+    runCatching {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+    }.onFailure {
+        Toast.makeText(context, "No app available to open the update link", Toast.LENGTH_LONG).show()
     }
 }
